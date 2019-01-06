@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {Text, TouchableOpacity, View} from 'react-native';
-import Navbar from './navbar';
 import styles, { theme } from '../styles';
+import { RIGHT, LEFT } from '../constants'
 
 const MARGIN = 4;
 
@@ -61,15 +61,15 @@ export default class Button extends Component {
             let badgeTextColor = theme[this.props.theme].badgeTextColor;
 
             let position = {};
-            position[Navbar.RIGHT] = -7;
+            position[RIGHT] = -7;
 
             if (typeof this.props.badge === 'object') {
                 value = this.props.badge.value;
                 if (this.props.badge.bgColor) badgeBgColor = this.props.badge.bgColor;
                 if (this.props.badge.textColor) badgeTextColor = this.props.badge.textColor;
-                if (this.props.badge.position == Navbar.LEFT) {
-                    delete(position[Navbar.RIGHT]);
-                    position[Navbar.LEFT] = -7;
+                if (this.props.badge.position == LEFT) {
+                    delete(position[RIGHT]);
+                    position[LEFT] = -7;
                 }
             }
 

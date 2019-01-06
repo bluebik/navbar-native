@@ -6,21 +6,7 @@ import Icon from './icon';
 import Button from './button';
 import styles, { theme, size } from '../styles';
 import { isIOS, iOS, iconName, fixIconName } from '../utils';
-
-const BACK = 'back';
-const CLOSE = 'close';
-const LOGIN = 'login';
-const MENU = 'menu';
-
-const FADE = 'fade';
-const SLIDE = 'slide';
-const NONE = 'none';
-
-const DARK = 'dark';
-const LIGHT = 'light';
-
-const LEFT = 'left';
-const RIGHT = 'right';
+import { BACK, CLOSE, LOGIN, MENU, FADE, SLIDE, NONE, DARK, LIGHT, LEFT, RIGHT } from '../constants';
 
 export default class Navbar extends Component {
 
@@ -133,7 +119,7 @@ export default class Navbar extends Component {
     }
 
     renderImage() {
-
+        const titleCenter = this.props.titleCenter;
         const image = <Image
             source={this._getImageTitleSource(this.props.image)}
             resizeMode={this._getImageResizeMode(this.props.image)}
@@ -141,6 +127,7 @@ export default class Navbar extends Component {
         />;
 
         switch (true) {
+            case (titleCenter):
             case (isIOS()):
                 return (
                     <View style={styles.navBarTitleContainer}>
@@ -154,7 +141,9 @@ export default class Navbar extends Component {
 
     renderTitle() {
         const titleColor = {color: (this.props.titleColor) ? this.props.titleColor : theme[this.theme].titleColor};
+        const titleCenter = this.props.titleCenter;
         switch (true) {
+            case (titleCenter && !!this.props.title && typeof this.props.title === "string"):
             case (isIOS() && !!this.props.title && typeof this.props.title === "string"):
                 return (
                     <View style={styles.navBarTitleContainer}>
@@ -190,6 +179,17 @@ export default class Navbar extends Component {
                 default:
                     return null;
             }
+        }
+        return null;
+    }
+
+    renderIconImage(props) {
+        if (!!props.image) {
+            return (
+                <View>
+                    <Image source={props.image} resizeMode={props.imageResizeMode} style={props.imageStyle} />
+                </View>
+            );
         }
         return null;
     }
@@ -256,6 +256,7 @@ export default class Navbar extends Component {
                         badge={props.badge}
                     >
                         {this.renderIcon(props, icon1_1, icon1_2)}
+                        {this.renderIconImage(props)}
                         {this.renderLabel(props)}
                         {this.renderIcon(props, icon2_1, icon2_2)}
                     </Button>
@@ -265,7 +266,9 @@ export default class Navbar extends Component {
 
     renderLeftButton() {
         const left = this.props.left;
+        const titleCenter = this.props.titleCenter;
         switch (true) {
+            case (titleCenter && Array.isArray(left)):
             case (isIOS() && Array.isArray(left)):
                 return (
                     <View style={styles.navBarMultiButtonContainer}>
@@ -274,6 +277,7 @@ export default class Navbar extends Component {
                         })}
                     </View>
                 );
+            case (titleCenter && typeof left === 'object'):
             case (isIOS() && typeof left === 'object'):
                 return this.renderButton(left, 'left', 'left', 'right', 'left');
             case (!iOS() && Array.isArray(left)):
@@ -331,7 +335,7 @@ export default class Navbar extends Component {
     }
 
     render() {
-        const renderTitle = isIOS() ? this.renderTitle() : null;
+        const renderTitle = (isIOS() || this.props.titleCenter) ? this.renderTitle() : null;
         const bgColor = { backgroundColor: this.props.bgColor ? this.props.bgColor : theme[this.theme].bgNavbarColor };
         return (
             <View style={[styles.navBarContainer, bgColor]} elevation={this.props.elevation}>
@@ -369,6 +373,12 @@ export default class Navbar extends Component {
         iconPos: PropTypes.string,
         iconSize: PropTypes.number,
         iconColor: PropTypes.string,
+        image: PropTypes.oneOfType([
+            PropTypes.string,
+            PropTypes.number,
+        ]),
+        imageStyle: PropTypes.object,
+        imageResizeMode: PropTypes.string,
         label: PropTypes.string,
         badge: PropTypes.oneOfType([
             PropTypes.number,
@@ -406,12 +416,6 @@ export default class Navbar extends Component {
             }
         }
     };
-
-    static FADE = FADE;
-    static SLIDE = SLIDE;
-    static NONE = NONE;
-    static LEFT = LEFT;
-    static RIGHT = RIGHT;
 }
 
 const buttonShape = PropTypes.shape(Navbar.buttonPropTypes);
@@ -424,6 +428,7 @@ Navbar.propTypes = {
         PropTypes.element
     ]),
     titleColor: PropTypes.string,
+    titleCenter: PropTypes.bool,
     bgColor: PropTypes.string,
     image: PropTypes.shape(Navbar.imagePropTypes),
     imageBackground: PropTypes.shape(Navbar.imagePropTypes),
